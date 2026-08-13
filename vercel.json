@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "env": {
+    "VITE_TMDB_API_KEY": {
+      "description": "TMDB API Key for movie search - get from https://www.themoviedb.org/settings/api"
+    }
+  }
+}

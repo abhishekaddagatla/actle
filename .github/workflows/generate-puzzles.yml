@@ -1,0 +1,45 @@
+name: Generate Daily Puzzles
+
+# Run daily at 12:01 AM UTC (can be adjusted)
+on:
+  schedule:
+    - cron: '1 0 * * *'
+  # Also allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate puzzles
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: npm run generate-puzzles
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Puzzle Generator Bot"
+          
+          # Check if puzzles.json changed
+          if git diff --quiet public/puzzles.json; then
+            echo "No changes to puzzles.json"
+          else
+            git add public/puzzles.json
+            git commit -m "chore: update daily puzzles [skip ci]"
+            git push
+          fi
