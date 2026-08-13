@@ -5,6 +5,7 @@ import { generateShareText, copyToClipboard } from '../utils'
 interface EndScreenProps {
   puzzle: Puzzle
   guessCount: number
+  solvedIndex?: number
   stats: GameStats
   onPlayAgain: () => void
 }
@@ -12,10 +13,11 @@ interface EndScreenProps {
 export const EndScreen: React.FC<EndScreenProps> = ({
   puzzle,
   guessCount,
+  solvedIndex,
   stats,
   onPlayAgain,
 }) => {
-  const shareText = generateShareText(puzzle, guessCount)
+  const shareText = generateShareText(puzzle, guessCount, solvedIndex)
   const [copySuccess, setCopySuccess] = React.useState(false)
 
   const handleCopy = async () => {

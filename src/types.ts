@@ -9,6 +9,7 @@ export interface Puzzle {
   id: string
   title: string
   year: number
+  tmdb_id?: number
   cast: Actor[]
 }
 
@@ -17,6 +18,8 @@ export interface GameState {
   currentGuessStep: number
   guesses: string[]
   isCompleted: boolean
+  solvedIndex?: number
+  revealedBeforeSolve?: number
 }
 
 export interface GameStats {

@@ -30,6 +30,22 @@ export class LocalStorageManager {
       currentGuessStep: 0,
       guesses: [],
       isCompleted: false,
+      solvedIndex: undefined,
+      revealedBeforeSolve: undefined,
+    }
+    this.saveGameState(state)
+    return state
+  }
+
+  // For testing: set game state to a specific puzzle date (useful for dev)
+  static setGameStateForDate(dateStr: string): GameState {
+    const state: GameState = {
+      lastPlayedDate: dateStr,
+      currentGuessStep: 0,
+      guesses: [],
+      isCompleted: false,
+      solvedIndex: undefined,
+      revealedBeforeSolve: undefined,
     }
     this.saveGameState(state)
     return state
@@ -94,19 +110,68 @@ export class LocalStorageManager {
 }
 
 export function compareMovieTitles(title1: string, title2: string): boolean {
-  return title1.trim().toLowerCase() === title2.trim().toLowerCase()
+  return normalize(title1) === normalize(title2)
 }
 
-export function generateShareText(puzzle: Puzzle, guessCount: number): string {
+// Normalize strings for matching: remove diacritics, punctuation, parentheses, leading articles, collapse spaces
+export function normalize(s: string): string {
+  if (!s) return ''
+  // remove unicode diacritics
+    let out = s
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\(.*?\)/g, '') // remove parenthetical content
+    .replace(/[^a-z0-9\s]/gi, ' ') // remove punctuation
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase()
+
+  // strip leading articles
+  out = out.replace(/^(the|a|an)\s+/i, '')
+  return out
+}
+
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+// More flexible acceptance: exact normalized match, id-confirmed, whole-phrase contains, or multi-word subset
+export function isAcceptableGuess(
+  guess: string,
+  title: string,
+  options?: { tmdbMatch?: boolean }
+): boolean {
+  const g = normalize(guess)
+  const t = normalize(title)
+  if (!g) return false
+  if (g === t) return true
+  if (options?.tmdbMatch) return true
+
+  // whole phrase match (require reasonable length)
+  if (g.length >= 4) {
+    const re = new RegExp('\\b' + escapeRegExp(g) + '\\b')
+    if (re.test(t)) return true
+  }
+
+  // multi-word subset: all words appear in title
+  const words = g.split(' ').filter(Boolean)
+  if (words.length >= 2 && words.every((w) => t.includes(w))) return true
+
+  return false
+}
+
+export function generateShareText(puzzle: Puzzle, guessCount: number, solvedIndex?: number): string {
   const totalSlots = 10
   const usedSlots = Math.min(guessCount, 10)
+  const isWin = typeof solvedIndex === 'number'
 
   let sequence = ''
   for (let i = 0; i < totalSlots; i++) {
     if (i < usedSlots - 1) {
-      sequence += '🟧 ' // Orange = hints used
+      sequence += '🟥 ' // Red = wrong guesses
     } else if (i === usedSlots - 1) {
-      sequence += '🟩 ' // Green = correct guess
+      // Last slot is green only if won, red if lost
+      sequence += isWin ? '🟩 ' : '🟥 '
     } else {
       sequence += '⬜ ' // White = unused
     }

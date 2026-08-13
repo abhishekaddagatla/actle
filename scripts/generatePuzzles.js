@@ -148,6 +148,7 @@ async function generatePuzzles() {
 
     puzzles[dateStr] = {
       id: dateStr,
+      tmdb_id: movie.id,
       title: movie.title,
       year: year,
       cast: cast,
