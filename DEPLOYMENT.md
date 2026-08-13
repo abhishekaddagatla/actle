@@ -172,22 +172,94 @@ The `.github/workflows/deploy-vercel.yml` already exists and will:
 
 ---
 
-## Part 5: Custom Domain (Optional)
+## Part 5: Custom Domain (Recommended: Subdomain)
 
-### 5.1 In Vercel
+For your setup, the easiest option is to host Cast Reveal on its own subdomain instead of under a path like `/actle`.
 
-1. Go to your Vercel project
-2. **Settings → Domains**
-3. Add your domain (e.g., `castreveal.game`)
-4. Follow DNS setup instructions
+### Method 1: Use a subdomain for the app
 
-### 5.2 In Domain Registrar
+Example:
+- `actle.abhishekaddagatla.xyz`
 
-Update your domain's DNS records to point to Vercel (Vercel provides the exact records to add).
+This is the cleanest approach if your main site is already on `abhishekaddagatla.xyz` and you want a separate app experience for the game.
+
+#### 5.1 Create a separate Vercel project
+
+1. In Vercel, click **Add New → Project**
+2. Import the same GitHub repo (or a dedicated repo if you prefer)
+3. Give the project a name like `cast-reveal-actle`
+4. Click **Deploy**
+
+#### 5.2 Add the custom domain in Vercel
+
+1. Open the Vercel project
+2. Go to **Settings → Domains**
+3. Click **Add Domain**
+4. Enter:
+   ```text
+   actle.abhishekaddagatla.xyz
+   ```
+5. Vercel will give you the exact DNS records to add
+
+#### 5.3 Add DNS records at your domain provider
+
+If your domain is managed by Cloudflare, GoDaddy, Namecheap, etc.:
+
+- Create a DNS record for the subdomain:
+  - Type: `CNAME`
+  - Name: `actle`
+  - Target: Vercel's domain shown in the Vercel UI (for example `cname.vercel-dns.com`)
+
+Example:
+```text
+Name: actle
+Type: CNAME
+Value: cname.vercel-dns.com
+```
+
+If Vercel provides an `A` record or `ALIAS`/`ANAME` record instead, use exactly that.
+
+#### 5.4 Wait for DNS propagation
+
+DNS can take a few minutes to a few hours to propagate.
+
+Once it settles, the app should be live at:
+```text
+https://actle.abhishekaddagatla.xyz
+```
 
 ---
 
-## Local Development
+### Method 2: Root domain under a path (not recommended for this case)
+
+If you wanted the app to live at:
+```text
+https://abhishekaddagatla.xyz/actle
+```
+
+that usually requires:
+- a single Vercel app serving routes under the root domain
+- custom rewrite rules or a reverse proxy setup
+- more complexity if you already have another site running there
+
+For your situation, a subdomain is the simplest and most reliable option.
+
+---
+
+## Part 6: Final Production Checklist
+
+Before shipping:
+
+1. Make sure `VITE_TMDB_API_KEY` is set in Vercel
+2. Generate `public/puzzles.json`
+3. Push to GitHub and confirm deployment succeeded
+4. Add the custom domain `actle.abhishekaddagatla.xyz`
+5. Verify the app loads correctly on the new subdomain
+6. Test one full round trip: guess, lose/win, copy share card, reset game
+
+---
+
+## Part 7: Local Development
 
 ### Start Development Server
 
