@@ -178,11 +178,11 @@ export function generateShareText(puzzle: Puzzle, guessCount: number, solvedInde
   }
 
   const dateNum = puzzle.id.replace(/-/g, '').slice(-2)
-  return `CAST REVEAL #${dateNum} 🎬
+  return `actle #${dateNum} 🎬
 ${guessCount}/10 ACTORS
 
 ${sequence.trim()}
-https://castreveal.game`
+https://actle-theta.vercel.app/`
 }
 
 export async function copyToClipboard(text: string): Promise<boolean> {
