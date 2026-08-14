@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { Puzzle, GameState, GameStats, Actor, TMDBMovie } from './types'
 import { LocalStorageManager, formatDate, isAcceptableGuess } from './utils'
 import { searchMovies } from './services/tmdb'
@@ -371,6 +372,7 @@ const App: React.FC = () => {
       )}
       {celebrate ? <Confetti /> : null}
       <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      <Analytics />
     </div>
   )
 }
