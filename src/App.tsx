@@ -37,7 +37,7 @@ const App: React.FC = () => {
         const todayPuzzle = data[today]
 
         // If in development (localhost or vite dev), pick a random puzzle to avoid repeating same movie
-        const runningDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || import.meta.env.MODE === 'development')
+        const runningDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || (import.meta as any).env?.MODE === 'development')
         if (runningDev) {
           const keys = Object.keys(data)
           if (keys.length > 0) {
@@ -204,7 +204,7 @@ const App: React.FC = () => {
   }
 
   // Dev helper: switch to a different puzzle date (for testing)
-  const isDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || import.meta.env.MODE === 'development')
+  const isDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || (import.meta as any).env?.MODE === 'development')
 
   const handleChangePuzzle = (dateStr: string) => {
     if (!allPuzzles) return
@@ -292,7 +292,6 @@ const App: React.FC = () => {
       ) : null}
 
       {/* compute revealed actors count (always at least 1) */}
-      {/** revealedCount is number of actors to display (1..cast.length) */}
       {puzzle && gameState && (
         (() => {
           const revealedCount = Math.min(puzzle.cast.length, Math.max(1, gameState.currentGuessStep + 1))

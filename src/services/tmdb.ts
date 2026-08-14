@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { TMDBMovie } from '../types'
 
-const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY
+const TMDB_API_KEY = (import.meta as any).env?.VITE_TMDB_API_KEY
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 
 const tmdbClient = axios.create({
